@@ -1,0 +1,124 @@
+/*
+ * working with data across multiple tables.
+ *
+ * Primary Key vs Foreign Key 
+ * Primary key = uniquely identifies each row of that table 
+ * When the primary key for one table appears in a different table, it is called a foreign key. 
+ */
+
+SELECT *
+FROM orders
+LIMIT 5;
+ 
+SELECT *
+FROM subscriptions
+LIMIT 5;
+ 
+SELECT * 
+FROM customers
+LIMIT 5;
+
+/* The first line selects all columns from our combined table. If we only want to select certain columns, 
+ *	we can specify which ones we want.
+ * The second line specifies the first table that we want to look in, orders
+ * The third line uses JOIN to say that we want to combine information from orders with customers.
+ * The fourth line tells us how to combine the two tables. We want to match orders table’s customer_id column 
+ * 	with customers table’s customer_id column.*/
+SELECT *
+FROM orders
+JOIN customers
+  ON orders.customer_id = customers.customer_id;
+  
+SELECT orders.order_id,
+   customers.customer_name
+FROM orders
+JOIN customers
+  ON orders.customer_id = customers.customer_id;
+  
+SELECT *
+FROM orders
+JOIN subscriptions 
+  ON orders.subscription_id  = subscriptions.subscription_id;
+  
+SELECT *
+FROM orders
+JOIN subscriptions 
+  ON orders.subscription_id  = subscriptions.subscription_id
+WHERE subscriptions.description ='Fashion Magazine';
+
+/* When we perform a simple JOIN (often called an inner join) our 
+ * result only includes rows that match our ON condition. */
+SELECT COUNT(*)
+FROM newspaper;
+
+SELECT COUNT(*)
+FROM online;
+
+SELECT COUNT(*)
+FROM newspaper
+JOIN online
+  ON newspaper.id = online.id;
+  
+/*  A left join will keep all rows from the first table, regardless of whether there 
+ * is a matching row in the second table. */ 
+SELECT *
+FROM newspaper /* table1 LHS */
+LEFT JOIN online /* table2 RHS */
+  ON newspaper.id = online.id;
+  
+SELECT *
+FROM newspaper
+LEFT JOIN online
+  ON newspaper.id = online.id
+  WHERE online.id IS NULL;
+  
+/* Inner join */
+SELECT *
+FROM classes
+JOIN students
+  ON classes.id = students.class_id;
+  
+/* cross join - combine all rows of one table with all rows of another table. */
+SELECT shirts.shirt_color,
+   pants.pants_color  /* select columns */
+FROM shirts /* pull data from this table */
+CROSS JOIN pants; /* cross join with pants */
+
+/* number of customers who were subscribed to the newspaper during March. */
+SELECT COUNT(*)
+FROM newspaper
+WHERE start_month <= 3 
+  AND end_month >= 3;
+/* check across all months, we’re going to need to use a cross join to restrict to two conditions. */
+SELECT *
+FROM newspaper
+CROSS JOIN months
+WHERE start_month <= month AND end_month >= month;
+/* query where you aggregate over each month to count the number of subscribers. */
+SELECT month,
+   COUNT(*) AS 'subscribers'
+FROM newspaper
+CROSS JOIN months
+WHERE start_month <= month 
+   AND end_month >= month
+GROUP BY month;
+
+/*  Union - combine two tables and they have the same columns. */
+SELECT * 
+FROM newspaper 
+UNION 
+SELECT * 
+FROM online;
+
+/* with - Often times, we want to combine two tables, but one of the tables is the result of another calculation. */
+WITH previous_query AS ( /* perform a separate query, previous_query is the alias that we will use to reference any columns from the query inside of the WITH clause*/
+   SELECT customer_id,
+      COUNT(subscription_id) AS 'subscriptions'
+   FROM orders
+   GROUP BY customer_id
+)
+SELECT customers.customer_name, 
+   previous_query.subscriptions
+FROM previous_query
+JOIN customers
+  ON previous_query.customer_id = customers.customer_id;
