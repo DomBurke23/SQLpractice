@@ -1,0 +1,180 @@
+CREATE TABLE movies (
+   id INTEGER, 
+   name TEXT, 
+   genre TEXT,
+   year INTEGER,
+   imdb_rating REAL /* decimal number */
+); 
+
+SELECT * FROM movies;
+
+/* only select the name and genre columns of the table. */
+SELECT name, genre 
+FROM movies;
+
+SELECT name, genre, year 
+FROM movies;
+
+/* AS is a keyword in SQL that allows you to rename a column or table using an alias. */
+SELECT name AS 'Titles'
+FROM movies;
+SELECT imdb_rating  AS 'IMDb'
+FROM movies;
+
+/* DISTINCT is used to return unique values in the output. */
+SELECT genre 
+FROM movies;
+
+SELECT DISTINCT genre 
+FROM movies;  /* removes the duplicates */
+
+/* We can restrict our query results using the WHERE clause in order to obtain only the information we want. 
+ * Following this format, the statement below filters the result set to only include 
+ * top rated movies (IMDb ratings greater than 8): */
+SELECT *
+FROM movies
+WHERE imdb_rating > 8; /* WHERE clause filters the result set to only include rows where the following condition is true. */
+
+SELECT * 
+FROM movies 
+WHERE imdb_rating < 5;
+
+SELECT * 
+FROM movies 
+WHERE year > 2014
+
+/* LIKE can be a useful operator when you want to compare similar values. 
+ * The movies table contains two films with similar titles, ‘Se7en’ and ‘Seven’. */
+SELECT * 
+FROM movies
+WHERE name LIKE 'Se_en'; /* starts with se and ends in en */
+
+SELECT * 
+FROM movies
+WHERE name LIKE 'A%'; /* movies that start with a */
+
+SELECT * 
+FROM movies 
+WHERE name LIKE '%man%'; /* movies that contain the word man in */
+
+SELECT * 
+FROM movies 
+WHERE name LIKE '%e'; /* movies that end in e */
+
+SELECT * 
+FROM movies
+WHERE name LIKE 'The %';
+
+/* missing values */
+SELECT name
+FROM movies 
+WHERE imdb_rating IS NOT NULL;
+
+SELECT name
+FROM movies 
+WHERE imdb_rating IS NULL;
+
+/* BETWEEN operator is used in a WHERE clause to filter the result set within a certain range. 
+ * It accepts two values that are either numbers, text or dates. */
+SELECT *
+FROM movies
+WHERE year BETWEEN 1990 AND 1999;
+
+SELECT *
+FROM movies
+WHERE name BETWEEN 'A' AND 'J';
+
+SELECT *
+FROM movies
+WHERE name BETWEEN 'D' AND 'G';
+
+SELECT *
+FROM movies
+WHERE year BETWEEN 1970 AND 1979;
+
+/* Sometimes we want to combine multiple conditions in a WHERE clause to make the result set more specific and useful. */
+SELECT * 
+FROM movies
+WHERE year BETWEEN 1990 AND 1999
+   AND genre = 'romance';
+   
+SELECT *
+FROM movies
+WHERE year BETWEEN 1970 AND 1979
+  AND imdb_rating > 8;
+  
+SELECT *
+FROM movies
+WHERE genre = "horror" AND year <1985;
+
+SELECT *
+FROM movies
+WHERE year > 2014
+   OR genre = 'action';
+   
+SELECT *
+FROM movies
+WHERE  genre = 'romance'
+   OR genre = 'comedy';
+   
+/* It is often useful to list the data in our result set in a particular order. */
+SELECT *
+FROM movies
+ORDER BY name; /* sort everything by the movie’s title from A through Z */
+
+SELECT *
+FROM movies
+WHERE imdb_rating > 8
+ORDER BY year DESC; /* descending year order */
+
+SELECT name, year
+FROM movies
+ORDER BY name;
+
+SELECT name, year, imdb_rating
+FROM movies
+ORDER BY imdb_rating ASC;
+
+SELECT name, year, imdb_rating
+FROM movies
+ORDER BY imdb_rating DESC;
+
+/*  cap the number of rows in the result. */
+SELECT *
+FROM movies
+LIMIT 10; /* prints first 10 rows */
+
+/* Combining your knowledge of LIMIT and ORDER BY, write a query that returns the top 3 highest rated movies. */
+SELECT *
+FROM movies
+ORDER BY imdb_rating DESC
+LIMIT 3;
+
+/* A CASE statement allows us to create different outputs (usually in the SELECT statement). 
+ * It is SQL’s way of handling if-then logic. 
+ * Suppose we want to condense the ratings in movies to three levels:
+ * 	If the rating is above 8, then it is Fantastic.
+ *	If the rating is above 6, then it is Poorly Received.
+ * 	Else, Avoid at All Costs. */
+SELECT name,
+ CASE
+  WHEN imdb_rating > 8 THEN 'Fantastic'
+  WHEN imdb_rating > 6 THEN 'Poorly Received'
+  ELSE 'Avoid at All Costs'
+ END
+FROM movies;
+
+SELECT name,
+ CASE
+  WHEN imdb_rating > 8 THEN 'Fantastic'
+  WHEN imdb_rating > 6 THEN 'Poorly Received'
+  ELSE 'Avoid at All Costs'
+ END AS 'Review' /* shorten column name */
+FROM movies;
+
+SELECT name,
+ CASE
+  WHEN genre = 'romance' OR genre = 'comedy' THEN 'Chill'
+  ELSE 'Intense'
+ END AS 'Mood'
+FROM movies;
